@@ -1,0 +1,33 @@
+services:
+  pg:
+    image: postgres:latest
+    environment:
+      - POSTGRES_PASSWORD=tut1su
+    expose:
+      - 5432
+    restart: always
+    volumes:
+      - ./sqldata:/docker-entrypoint-initdb.d/
+  books-api:
+    image: books-api:latest
+    environment:
+      - DOTNET_URLS=http://*:5000
+      - ConnectionStrings__DBCONN=Host=pg;Port=5432;Database=tut1;Username=tut1;Password=tut1;
+    expose:
+      - 5000
+  films-api:
+    image: films-api:latest
+    environment:
+      - DATABASE_URL=postgresql://postgres:tut1su@pg:5432/film?schema=public
+    expose:
+      - 5000
+  www:
+    image: nginx:latest
+    ports:
+      - 80:80
+    environment:
+      - BOOKS_API=books-api
+      - FILMS_API=films-api
+    volumes:
+      - ./nginx.conf:/tmp/nginx.conf
+    command: /bin/bash -c "envsubst < /tmp/nginx.conf > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
