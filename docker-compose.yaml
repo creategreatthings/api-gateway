@@ -25,9 +25,5 @@ services:
     image: nginx:latest
     ports:
       - 80:80
-    environment:
-      - BOOKS_API=books-api
-      - FILMS_API=films-api
     volumes:
-      - ./nginx.conf:/tmp/nginx.conf
-    command: /bin/bash -c "envsubst < /tmp/nginx.conf > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
